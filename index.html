@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Teste Mapas - Leaflet + GeoJSON</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 20px;
+        }
+
+        .wrap {
+            width: 779px;
+            margin: auto;
+        }
+
+        h3 {
+            color: #005EB9;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        #map {
+            height: 430px;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        .search-box {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .search-input {
+            padding: 6px 10px;
+            width: 60%;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .reset-btn {
+            margin-left: 10px;
+            padding: 6px 12px;
+            border: none;
+            background-color: #005EB9;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .reset-btn:hover {
+            background-color: #0a6ee1;
+        }
+
+        .no-results {
+            color: #999;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <h3>Consulta de Unidades SEBRAE/MA</h3>
+
+        <div class="search-box">
+            <input id="search" class="search-input" type="text" placeholder="🔍 Pesquise por nome da unidade..." />
+            <button id="reset" class="reset-btn">Recentrar mapa</button>
+            <div id="no-results" class="no-results" style="display:none;">Nenhuma unidade encontrada.</div>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Centralização padrão (Maranhão)
+        const INITIAL_VIEW = { center: [-4.5, -45.0], zoom: 6 };
+
+        // Inicializa o mapa
+        const map = L.map('map').setView(INITIAL_VIEW.center, INITIAL_VIEW.zoom);
+
+        // Adiciona o mapa base (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Lista das Unidades SEBRAE/MA
+        const unidades = [
+            {
+                nome: "SEBRAE/MA - Sede",
+                endereco: "Av. Prof. Carlos Cunha, s/n - Jaracaty, São Luís - MA, 65076-820",
+                contato: "+55 800 570 0800",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE-MA:+Servi%C3%A7o+de+Apoio+%C3%A0s+Micro+e+Pequenas+Empresas+do+Maranh%C3%A3o/@-2.5100803,-44.287521,17z/data=!3m1!4b1!4m6!3m5!1s0x7f68e80ce3d75a5:0xa41303c7899088fa!8m2!3d-2.5100803!4d-44.287521!16s%2Fg%2F11b6hrrvnf?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-2.5100803, -44.287521]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Açailândia",
+                endereco: "Rua São Raimundo, nº 59 - Centro, Açailândia - MA, 65930-000",
+                contato: "-",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/Sala+do+Empreendedor+de+A%C3%A7ailandia+-+SEBRAE/@-4.9539591,-47.5035694,17z/data=!3m1!4b1!4m6!3m5!1s0x92c5f561be7eea5f:0xa69507fd440f466a!8m2!3d-4.9539591!4d-47.5035694!16s%2Fg%2F11qgsb7c0t?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-4.9539591, -47.5035694]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Bacabal",
+                endereco: "R. Osvaldo Cruz, 715, Bacabal - MA, 65700-000",
+                contato: "+55 99 3621-1084",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE-Servi%C3%A7o+de+Apoio+%C3%A0s+Micro+e+Pequenas+Empresas/@-4.2320622,-44.7811484,17z/data=!3m1!4b1!4m6!3m5!1s0x78a6ece929774b7:0xe2231db6d87696ae!8m2!3d-4.2320622!4d-44.7811484!16s%2Fg%2F1wyc4jqx?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-4.2320622, -44.7811484]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Balsas",
+                endereco: "R. Padre Franco, 628, Balsas - MA, 65800-000",
+                contato: "-",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE/@-7.529985,-46.0384073,17z/data=!3m1!4b1!4m6!3m5!1s0x92d5ef981f8d7a19:0xb5aeef0f1d9e91b3!8m2!3d-7.529985!4d-46.0384073!16s%2Fg%2F11yb7rj0sp?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-7.529985, -46.0384073]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Caxias",
+                endereco: "Rua 1º de Agosto, 617 - Centro, Caxias - MA, 65604-150",
+                contato: "+55 98 99974-2007",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE+CAXIAS/@-4.8646769,-43.3613124,17z/data=!3m1!4b1!4m6!3m5!1s0x78e938e6b3dda4d:0x6889949ec2a59d54!8m2!3d-4.8646769!4d-43.3613124!16s%2Fg%2F11q8x28qjh?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-4.8646769, -43.3613124]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Imperatriz",
+                endereco: "Av. Bernardo Sayão, 996 - Nova Imperatriz, Imperatriz - MA, 65919-170",
+                contato: "+55 99 3525-2254",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE+Servi%C3%A7o+de+Apoio+%C3%A0s+Micro+e+Pequenas+Empresas/@-5.5215424,-47.4899295,17z/data=!3m1!4b1!4m6!3m5!1s0x92c55fa5598cbf73:0xa12401f8625da9dd!8m2!3d-5.5215424!4d-47.4899295!16s%2Fg%2F11b8_r320l?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-5.5215424, -47.4899295]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Pinheiro",
+                endereco: "R. Maria Pinheiro Paiva, Pinheiro - MA, 65200-000",
+                contato: "+55 98 99191-9305",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE-Servi%C3%A7o+de+Apoio+%C3%A0s+Micro+e+Pequenas+Empresas/@-2.5192806,-45.0864343,17z/data=!3m1!4b1!4m6!3m5!1s0x92b34e73fcabc921:0x57f486fa0d4a54eb!8m2!3d-2.5192806!4d-45.0864343!16s%2Fg%2F1tf7t68y?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-2.5192806, -45.0864343]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Presidente Dutra",
+                endereco: "R. Pref. Nelson Sereno, SN - Loja 05, Pres. Dutra - MA, 65760-000",
+                contato: "+55 99 3663-4657",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/Sebrae+Presidente+Dutra/@-5.2834863,-44.4942336,17z/data=!3m1!4b1!4m6!3m5!1s0x7885dc2ac8f9d11:0xbe9e1b90494d802e!8m2!3d-5.2834863!4d-44.4942336!16s%2Fg%2F11g9nj_2zz?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-5.2834863, -44.4942336]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Santa Inês",
+                endereco: "Av. Luiz Muniz, 1005 - Centro, Santa Inês - MA, 65300-115",
+                contato: "+55 98 99203-0788",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE+-+Sala+do+Empreendedor+de+Santa+In%C3%AAs/@-3.6572962,-45.3777343,17z/data=!3m1!4b1!4m6!3m5!1s0x92ca9dbbd1ca9f0d:0x8968e12289543ad9!8m2!3d-3.6572962!4d-45.3777343!16s%2Fg%2F11sfrslqlm?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-3.6572962, -45.3777343]
+            },
+            {
+                nome: "SEBRAE/MA - Unidade Regional Timon",
+                endereco: "R. Odilo Costa, 76 C - Centro, Timon - MA, 65630-000",
+                contato: "+55 99 3212-2712",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/Sebrae/@-5.0990981,-42.8248658,17z/data=!3m1!4b1!4m6!3m5!1s0x78e379185663cad:0x975bd9c661b70a8a!8m2!3d-5.0990981!4d-42.8248658!16s%2Fg%2F11j0h9cllx?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-5.0990981, -42.8248658]
+            },
+            {
+                nome: "SEBRAE/MA - São José de Ribamar",
+                endereco: "Av. Gonçalves Dias, 1190 - Centro, São José de Ribamar - MA, 65110-000",
+                contato: "+55 98 99268-7399",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/Sala+do+Empreendedor+de+S%C3%A3o+Jos%C3%A9+de+Ribamar+-+SEBRAE/@-2.5548317,-44.0595501,17z/data=!3m1!4b1!4m6!3m5!1s0x7f6bd055ee62a65:0x3af8fb7a821c868d!8m2!3d-2.5548317!4d-44.0595501!16s%2Fg%2F11qg23wsf6?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-2.5548317, -44.0595501]
+            },
+            {
+                nome: "SEBRAE/MA - Chapadinha",
+                endereco: "Praça da Matriz - Centro, Chapadinha - MA, 65500-000",
+                contato: "-",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/SEBRAE+-+Sala+do+Empreendedor+de+Chapadinha/@-3.7419301,-43.3596593,17z/data=!3m1!4b1!4m6!3m5!1s0x78ccd6b0969ef57:0x8308a415f26d1200!8m2!3d-3.7419301!4d-43.3596593!16s%2Fg%2F11s18jts3h?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-3.7419301, -43.3596593]
+            },
+            {
+                nome: "SEBRAE/MA - Rosário",
+                endereco: "Av. Vitorino Freire, Rosário - MA, 65150-000",
+                contato: "-",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/Sebrae/@-2.9366551,-44.2488804,17z/data=!3m1!4b1!4m6!3m5!1s0x7f4487615b9f2bf:0xae1f25fc90a0e0a6!8m2!3d-2.9366551!4d-44.2488804!16s%2Fg%2F11hm3q_6h3?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-2.9366551, -44.2488804]
+            },
+            {
+                nome: "SEBRAE/MA - Barreirinhas",
+                endereco: "R. Conrado Ataíde, Barreirinhas - MA, 65590-000",
+                contato: "+55 98 99190-8424",
+                site: "https://sebrae.com.br",
+                googleMaps: " https://www.google.com/maps/place/Sebrae+Barreirinhas/@-2.7518351,-42.8273392,17z/data=!3m1!4b1!4m6!3m5!1s0x7f21fd39e455679:0xe9a7376b53f6b7cb!8m2!3d-2.7518351!4d-42.8273392!16s%2Fg%2F11j7dtbjsq?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-2.7518351, -42.8273392]
+            },
+            {
+                nome: "SEBRAE/MA - Grajaú",
+                endereco: "R. Antônio Francisco dos Reis, 34 - Bairro Centro, Grajaú - MA, 65940-000",
+                contato: "+55 98 99166-0214",
+                site: "https://sebrae.com.br",
+                googleMaps: "https://www.google.com/maps/place/Sebrae+Graja%C3%BA/@-5.8188784,-46.1433476,17z/data=!3m1!4b1!4m6!3m5!1s0x92d21d003e0123d3:0x37cfed308138cb0a!8m2!3d-5.8188784!4d-46.1433476!16s%2Fg%2F11vtb5p9_t?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D",
+                coords: [-5.8188784, -46.1433476]
+            }
+        ];
+
+        // Cria os marcadores e guarda referência
+        const marcadores = [];
+
+        unidades.forEach(u => {
+            const popup = `
+        <div class="popup-content">
+          <h3>${u.nome}</h3>
+          <p><strong>Endereço:</strong> ${u.endereco}</p>
+          <p><strong>Contato:</strong> ${u.contato}</p>
+          <p><a href="${u.site}" target="_blank">🌐 Site</a> |
+          <a href="${u.googleMaps}" target="_blank">🗺️ Google Maps</a></p>
+        </div>`;
+            const marker = L.marker(u.coords).addTo(map).bindPopup(popup);
+            marcadores.push({ marker, ...u });
+        });
+
+        // Função de pesquisa
+        const searchInput = document.getElementById("search");
+        const noResults = document.getElementById("no-results");
+
+        searchInput.addEventListener("input", e => {
+            const term = e.target.value.toLowerCase();
+            noResults.style.display = "none";
+
+            if (!term) {
+                // Mostrar todos os marcadores se a pesquisa estiver vazia
+                marcadores.forEach(m => map.addLayer(m.marker));
+                return;
+            }
+
+            const resultados = marcadores.filter(m => m.nome.toLowerCase().includes(term));
+
+            marcadores.forEach(m => map.removeLayer(m.marker)); // esconde todos
+            resultados.forEach(m => map.addLayer(m.marker));    // mostra apenas os filtrados
+
+            if (resultados.length > 0) {
+                const primeiro = resultados[0];
+                map.setView(primeiro.coords, 10);
+                primeiro.marker.openPopup();
+            } else {
+                noResults.style.display = "block";
+            }
+        });
+
+        // Botão para recentralizar
+        document.getElementById("reset").addEventListener("click", () => {
+            searchInput.value = "";
+            noResults.style.display = "none";
+            marcadores.forEach(m => map.addLayer(m.marker));
+            map.setView(INITIAL_VIEW.center, INITIAL_VIEW.zoom);
+        });
+    </script>
+</body>
+
+</html>
