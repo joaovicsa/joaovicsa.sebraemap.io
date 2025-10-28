@@ -17,16 +17,11 @@
             margin: auto;
         }
 
-        h3 {
-            color: #005EB9;
-            text-align: center;
-            margin-bottom: 6px;
-        }
-
         #map {
-            height: 420px;
+            height: 450px;
             width: 100%;
             border: 1px solid #ddd;
+            border-radius: 12px;
         }
 
         .search-box {
@@ -69,11 +64,9 @@
 
 <body>
     <div class="wrap">
-        <h3>Consulta de Unidades - SEBRAE/MA</h3>
-
         <div class="search-box">
             <input id="search" class="search-input" type="text" placeholder="🔍 Pesquise por nome da unidade..." />
-            <button id="reset" class="reset-btn">Recentrar mapa</button>
+            <button id="reset" class="reset-btn">Limpar Pesquisa</button>
             <div id="no-results" class="no-results" style="display:none;">Nenhuma unidade encontrada.</div>
         </div>
 
