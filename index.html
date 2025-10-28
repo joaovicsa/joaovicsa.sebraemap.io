@@ -15,6 +15,7 @@
         .wrap {
             width: 482px;
             margin: auto;
+            transition: width 0.3s ease;
         }
 
         #map {
@@ -22,6 +23,7 @@
             width: 100%;
             border: 1px solid #ddd;
             border-radius: 12px;
+            transition: width 0.3s ease;
         }
 
         .search-box {
@@ -59,7 +61,30 @@
             font-size: 13px;
             margin-top: 5px;
         }
+
+        /* 🔹 Responsividade para telas menores ou iguais a 1024px */
+        @media (max-width: 1024px) {
+            .wrap {
+                width: 90%;
+                max-width: 380px;
+            }
+
+            #map {
+                height: 400px;
+            }
+
+            .search-input {
+                width: 70%;
+                font-size: 13px;
+            }
+
+            .reset-btn {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+        }
     </style>
+
 </head>
 
 <body>
