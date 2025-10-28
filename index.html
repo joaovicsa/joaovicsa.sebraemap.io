@@ -14,6 +14,7 @@
 
         .wrap {
             width: 482px;
+            /* 🔹 padrão para desktop */
             margin: auto;
             transition: width 0.3s ease;
         }
@@ -23,7 +24,7 @@
             width: 100%;
             border: 1px solid #ddd;
             border-radius: 12px;
-            transition: width 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .search-box {
@@ -62,8 +63,8 @@
             margin-top: 5px;
         }
 
-        /* 🔹 Responsividade para telas menores ou iguais a 1024px */
-        @media (max-width: 1024px) {
+        /* 🔹 Tablet (entre 601px e 1024px) */
+        @media (max-width: 1024px) and (min-width: 601px) {
             .wrap {
                 width: 90%;
                 max-width: 380px;
@@ -80,11 +81,39 @@
 
             .reset-btn {
                 padding: 6px 10px;
+                margin-top: 5px;
+                font-size: 13px;
+            }
+        }
+
+        /* 🔹 Mobile (≤600px) */
+        @media (max-width: 600px) {
+            body {
+                margin: 10px;
+            }
+
+            .wrap {
+                width: 100%;
+                max-width: none;
+            }
+
+            #map {
+                height: 360px;
+            }
+
+            .search-input {
+                width: 80%;
+                font-size: 12px;
+            }
+
+            .reset-btn {
+                margin-top: 8px;
+                display: block;
+                width: 95%;
                 font-size: 13px;
             }
         }
     </style>
-
 </head>
 
 <body>
