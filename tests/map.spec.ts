@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+test('Título carrega corretamente', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('h3')).toContainText('Consulta de Unidades');
+});
+
+
 test('Verifica se o mapa é renderizado', async ({ page }) => {
     await page.goto('http://localhost:3000'); // ou o endereço local da tua app
     const map = page.locator('#map');
