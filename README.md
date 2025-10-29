@@ -106,16 +106,6 @@ O deploy é feito automaticamente via GitHub Actions sempre que há commit na br
 
 Assim, qualquer alteração feita e enviada para a branch main dispara automaticamente os testes e a publicação no GitHub Pages.
 
-.gitignore
-
-O projeto ignora arquivos temporários e pastas de dependências:
-
-node_modules/
-test-results/
-playwright-report/
-.gitignore
-.env # Arquivos de ambiente
-
 ### Autor
 
 João Sá
