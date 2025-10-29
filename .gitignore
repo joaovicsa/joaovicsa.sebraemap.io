@@ -1,0 +1,67 @@
+# ======================================
+# 🔧 Node & Playwright
+# ======================================
+
+# Dependências
+node_modules/
+
+# Cache e logs do Playwright
+playwright-report/
+test-results/
+blob-report/
+trace.zip
+
+# Logs em geral
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / distribuição (caso use no futuro)
+dist/
+build/
+out/
+
+# ======================================
+# ⚙️ Configurações e ambiente
+# ======================================
+
+# Arquivo de variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Cache do VSCode e TypeScript
+.vscode/
+*.tsbuildinfo
+
+# ======================================
+# 🧪 Testes e relatórios
+# ======================================
+
+# Cobertura de testes (caso use futuramente)
+coverage/
+coverage-final.json
+*.lcov
+
+# Relatórios HTML do Playwright
+playwright-report/
+html-report/
+
+# ======================================
+# 🧼 Sistema / editor
+# ======================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# ======================================
+# 📦 GitHub Actions (artefatos)
+# ======================================
+
+# Pasta temporária de workflows
+.github/workflows/temp/
