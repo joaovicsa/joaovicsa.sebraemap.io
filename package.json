@@ -22,7 +22,8 @@
     "@playwright/test": "^1.56.1",
     "@types/dotenv": "^6.1.1",
     "@types/node": "^24.9.2",
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "serve": "^14.2.5"
   },
   "dependencies": {
     "dotenv": "^17.2.3"
